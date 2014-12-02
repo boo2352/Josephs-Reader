@@ -1,0 +1,173 @@
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import javax.swing.JFrame;
+
+
+public  class TextWindows extends JFrame {
+
+	//locations of the reading sources
+   protected String firstStorySource = "D:/Java things/eclipse things/Josephs Reader/THE WOLF AND THE KID.txt";
+   protected String secondStorySource = "D:/Java things/eclipse things/Josephs Reader/MY LORD BAG OF RICE.txt";
+   protected String thirdStorySource = "D:/Java things/eclipse things/Josephs Reader/THE GLASS DOG.txt";
+   protected String fourthStorySource = "D:/Java things/eclipse things/Josephs Reader/THE STORY OF MANKIND.txt";
+   protected String fifthStorySource = "D:/Java things/eclipse things/Josephs Reader/MOZART.txt";
+	//location of the word list
+   protected String myWordList = "D:/Java things/eclipse things/Josephs Reader/My Word List.txt";
+   protected String selectedWord = "";//the word highlighted by user --will be spoken
+   protected ArrayList<String> wordList = new ArrayList<>();
+   protected String dictDefinition = "";//word definition
+	
+	
+	/**
+	 * @return the myWordLIst
+	 */
+   public String getMyWordList() {
+      return myWordList;
+   }
+	/**
+	 * @return the thirdStorySource
+	 */
+   public String getThirdStorySource() {
+      return thirdStorySource;
+   }
+	/**
+	 * @param thirdStorySource the thirdStorySource to set
+	 */
+   public void setThirdStorySource(String thirdStorySource) {
+      this.thirdStorySource = thirdStorySource;
+   }
+	/**
+	 * @return the fourthStorySource
+	 */
+   public String getFourthStorySource() {
+      return fourthStorySource;
+   }
+	/**
+	 * @param fourthStorySource the fourthStorySource to set
+	 */
+   public void setFourthStorySource(String fourthStorySource) {
+      this.fourthStorySource = fourthStorySource;
+   }
+	/**
+	 * @return the fifthStorySource
+	 */
+   public String getFifthStorySource() {
+      return fifthStorySource;
+   }
+	/**
+	 * @param fifthStorySource the fifthStorySource to set
+	 */
+   public void setFifthStorySource(String fifthStorySource) {
+      this.fifthStorySource = fifthStorySource;
+   }
+	/**
+	 * @return the dictDefinition
+	 */
+   public String getDictDefinition() {
+      return dictDefinition;
+   }
+	/**
+	 * @param dictDefinition the dictDefinition to set
+	 */
+   public void setDictDefinition(String dictDefinition) {
+      this.dictDefinition = dictDefinition;
+   }
+	/**
+	 * @return the firstStorySource
+	 */
+   public String getFirstStorySource() {
+      return firstStorySource;
+   }
+	/**
+	 * @param firstStorySource the firstStorySource to set
+	 */
+   public void setFirstStorySource(String firstStorySource) {
+      this.firstStorySource = firstStorySource;
+   }
+	/**
+	 * @return the secondStorySource
+	 */
+   public String getSecondStorySource() {
+      return secondStorySource;
+   }
+	/**
+	 * @param secondStorySource the secondStorySource to set
+	 */
+   public void setSecondStorySource(String secondStorySource) {
+      this.secondStorySource = secondStorySource;
+   }
+	/**
+	 * @param myWordLIst the myWordLIst to set
+	 */
+   public void setMyWordList(String myWordLIst) {
+      this.myWordList = myWordLIst;
+   }
+	/**
+	 * @return the selectedWord
+	 */
+   public String getSelectedWord() {
+      return selectedWord;
+   }
+	/**
+	 * @param selectedWord the selectedWord to set
+	 */
+   public void setSelectedWord(String selectedWord) {
+      this.selectedWord = selectedWord;
+   }
+	/**
+	 * @return the wordList
+	 */
+   public ArrayList<String> getWordList() {
+      return wordList;
+   }
+	
+	/**get the text file of the story for the text panel
+	 * 
+	 * @param fileLoc the location of the text file
+	 * @return the text from the file loc
+	 * @throws IOException
+	 */
+   public String getStory(String fileLoc) throws IOException{
+     //open file
+      File file = new File(fileLoc);
+      Scanner inputFile = new Scanner(file);
+      String storyText = "";
+   //read lines until none left
+      while(inputFile.hasNext())
+         storyText += (inputFile.nextLine()+"\n");// add each line to the text with line feed
+   
+      inputFile.close();
+      return storyText;
+   }
+
+	/**get the words from My Word List file and put into wordList arraylist 
+	 * 
+	 * @param fileLoc the location of the text file
+	 * @return the words from the file loc
+	 * @throws IOException
+	 */
+   public void getSavedWords(String fileLoc) throws IOException{
+     //open file
+      File file = new File(fileLoc);
+      Scanner inputFile = new Scanner(file);
+    
+   //read lines until none left
+      while(inputFile.hasNext())
+         wordList.add (inputFile.nextLine());// add each word to wordList array
+   
+      inputFile.close();
+   
+   }
+	
+   public String setWordList(ArrayList<String> theList) {
+      String savedWords = "";
+      for (int i = 0; i <theList.size(); i++){
+      
+         savedWords +=theList.get(i) + "\n";
+      }
+      return savedWords;
+   }
+}
