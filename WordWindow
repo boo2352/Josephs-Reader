@@ -1,0 +1,51 @@
+import java.awt.EventQueue;
+import java.awt.Font;
+
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextPane;
+
+
+@SuppressWarnings("serial")
+public class WordWindow extends TextWindows {
+	
+   public WordWindow(){
+   
+      setTitle("Word List");
+      setSize(200,400);
+      setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+      getContentPane().setLayout(null);
+   
+      JScrollPane scrollPane = new JScrollPane();
+      scrollPane.setLocation(0, 0);
+      scrollPane.setSize(174,350);;
+      getContentPane().add(scrollPane);
+   
+      JTextPane wordPane = new JTextPane();
+      wordPane.setEditable(false);
+      try {
+         wordPane.setText(getStory(getMyWordList()));
+      } 
+      catch (IOException e) {
+      // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      wordPane.setFont(new Font("Tahoma", Font.PLAIN, 18));
+      scrollPane.setViewportView(wordPane);
+      setVisible(true);
+   
+   }
+	
+}
+
+
+
