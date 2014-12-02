@@ -1,0 +1,25 @@
+import java.awt.EventQueue;
+
+
+public class StoryReaderRun {
+	/**
+	 * Launch the application.
+	 */
+   public static void main(String[] args) {
+   	
+      EventQueue.invokeLater(
+            new Runnable() {
+               public void run() {
+                  try {
+                     StoryReader frame = new StoryReader();
+                     frame.setVisible(true);
+                  } 
+                  catch (Exception e) {
+                     e.printStackTrace();
+                  }
+               }
+            });
+   	
+   }
+}
+
