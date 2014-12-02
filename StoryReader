@@ -1,0 +1,293 @@
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+
+import de.tudarmstadt.ukp.jwktl.JWKTL;
+import de.tudarmstadt.ukp.jwktl.api.IWiktionaryEdition;
+import de.tudarmstadt.ukp.jwktl.api.IWiktionaryEntry;
+import de.tudarmstadt.ukp.jwktl.api.IWiktionaryPage;
+import de.tudarmstadt.ukp.jwktl.api.IWiktionarySense;
+
+
+@SuppressWarnings("serial")
+public class StoryReader extends TextWindows  {
+
+   private JTextPane storyText;//the pane holding the story text
+   private JPanel contentPane;// the main panel
+   private JTextPane Dictionary;//pane holding the dictionary
+	
+
+	/**
+	 * Create the frame.
+	 * @throws IOException 
+	 */
+   public StoryReader() throws IOException {
+      setTitle("JOSEPH'S READER");
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      setBounds(100, 100, 800, 700);
+      contentPane = new JPanel();//create a panel
+      contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+      contentPane.setBackground(Color.gray);
+      setContentPane(contentPane);
+   	/** create the pane for the text of the story
+   	 * 
+   	 */
+      JScrollPane scrollPane = new JScrollPane();
+      scrollPane.setBounds(300, 5, 680, 538);
+      contentPane.add(scrollPane);
+      storyText = new JTextPane();
+      storyText.setEditable(false);
+      storyText.setText(null);
+      storyText.setFont(new Font("Tahoma", Font.PLAIN, 18));
+      scrollPane.setViewportView(storyText);
+   		
+   		/**this is a mouseListener to read word that is highlighted
+   		 * double click in the word to have it read (ALTHOUGH THIS GIVES OUT OF MEMORY ERROR)
+   		 * click and drag to have section of text read -- can use for individual word
+   		 */
+      storyText.addMouseListener(
+            new MouseAdapter() {   
+               @Override
+               public void mouseReleased(MouseEvent e) {
+                  selectedWord = storyText.getSelectedText();
+                  TTSreadtext speakWord = new TTSreadtext();
+                  speakWord.speak(selectedWord);
+               }
+            });
+   	
+   		/**create pane for dictionary definition
+   		 * 
+   		 */
+      JScrollPane DictScroll = new JScrollPane();
+      DictScroll.setBounds(300, 554, 680, 96);
+      contentPane.add(DictScroll);
+   		
+      Dictionary = new JTextPane();
+      Dictionary.setFont(new Font("Tahoma", Font.PLAIN, 14));
+      Dictionary.setEditable(false);
+      Dictionary.setText(null);
+      DictScroll.setViewportView(Dictionary);
+   		
+   	/**create buttons
+   	 * 	
+   	 */
+   	//button to open word list
+      JButton wordList = new JButton("Word List");
+      wordList.setFont(new Font("Tahoma", Font.PLAIN, 14));
+      wordList.setBounds(169, 123, 105, 37);
+      wordList.addActionListener(new setWordListListener());
+   	
+   	
+   	//button that will save selected word
+      JButton saveWord = new JButton("Save Word");
+      saveWord.setFont(new Font("Tahoma", Font.PLAIN, 14));
+      saveWord.setBounds(169, 75, 105, 37);
+      saveWord.addActionListener(new setWordWindowListener());
+      contentPane.setLayout(null);
+   	
+   	//button to get definition of selected word
+      JButton getDef = new JButton("Definition");
+      getDef.setFont(new Font("Tahoma", Font.PLAIN, 14));
+      getDef.setBounds(169, 171, 105, 37);
+      getDef.addActionListener(new setDefinitionListener());
+   	
+   	/** create menu to select story
+   	 * 
+   	 */
+      JMenuBar menuBar = new JMenuBar();
+      menuBar.setBounds(10, 5, 100, 30);
+      contentPane.add(menuBar);
+   	
+   	// Define and add  drop down menu to the menubar  
+      JMenu storyMenu = new JMenu("Select Story");
+      menuBar.add(storyMenu);
+      storyMenu.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+      JMenuItem openFirstStory = new JMenuItem("The Wolf and the Kid");
+      openFirstStory.addActionListener(new setTextListener());
+   	
+      JMenuItem openSecondStory = new JMenuItem("My Lord Bag of Rice");
+      openSecondStory.addActionListener(new setTextListener());
+   	
+      JMenuItem openThirdStory = new JMenuItem("The Glass Dog");
+      openThirdStory.addActionListener(new setTextListener());
+   	
+      JMenuItem openFourthStory = new JMenuItem("THe Story of Mankind");
+      openFourthStory.addActionListener(new setTextListener());
+   	
+      JMenuItem openFifthStory = new JMenuItem("Mozart");
+      openFifthStory.addActionListener(new setTextListener());
+   	
+      storyMenu.add(openFirstStory);
+      storyMenu.add(openSecondStory);
+      storyMenu.add(openThirdStory);
+      storyMenu.add(openFourthStory);
+      storyMenu.add(openFifthStory);
+   	
+   //colors of buttons
+      saveWord.setBackground(Color.BLUE);
+      saveWord.setForeground(Color.WHITE);
+      contentPane.add(saveWord);
+      wordList.setBackground(Color.BLUE);
+      wordList.setForeground(Color.WHITE);
+      contentPane.add(wordList);
+      getDef.setForeground(Color.WHITE);
+      getDef.setBackground(Color.BLUE);
+      contentPane.add(getDef);
+   	
+   
+   }
+		
+	/**inner class to implement newText button that adds story to text panel
+	 *
+	 */
+   public class setTextListener implements ActionListener{
+      public void actionPerformed(ActionEvent e){
+         String cmd = e.getActionCommand(); //find out which story has been picked
+      
+      	//get words saved in text file myWordList
+         try {
+            getSavedWords(myWordList);//load in the saved words
+         } 
+         catch (IOException e2) {
+         	// TODO Auto-generated catch block
+            e2.printStackTrace();
+         }
+      	
+      	//get text of story
+         if (cmd == "The Wolf and the Kid"){
+         			
+            try {
+               storyText.setText(getStory(getFirstStorySource()));
+            } 
+            catch (IOException e1) {
+            	// TODO Auto-generated catch block
+               e1.printStackTrace();
+            }
+         }
+         else if (cmd == "My Lord Bag of Rice"){
+            try {
+               storyText.setText(getStory(getSecondStorySource()));
+            } 
+            catch (IOException e1) {
+            		// TODO Auto-generated catch block
+               e1.printStackTrace();
+            }
+         }
+         else if (cmd == "The Glass Dog"){
+            try {
+               storyText.setText(getStory(getThirdStorySource()));
+            } 
+            catch (IOException e1) {
+            		// TODO Auto-generated catch block
+               e1.printStackTrace();
+            }
+         }
+         else if (cmd == "The GStory of Mankind"){
+            try {
+               storyText.setText(getStory(getFourthStorySource()));
+            } 
+            catch (IOException e1) {
+            		// TODO Auto-generated catch block
+               e1.printStackTrace();
+            }
+         }
+         else if (cmd == "Mozart"){
+            try {
+               storyText.setText(getStory(getFifthStorySource()));
+            } 
+            catch (IOException e1) {
+            		// TODO Auto-generated catch block
+               e1.printStackTrace();
+            }
+         }
+      }	
+   }
+			
+		/*Saves highlighted word to ArrayList that is sorted alphabeticallyNOTE IF WORD BEGINS WITH CAP IT COMES BEFORE OTHERS
+		 *   
+		 */
+		/**save highlighted word to word list when button is clicked
+		
+		 */
+   public class setWordWindowListener implements ActionListener {	
+      public void actionPerformed(ActionEvent e){
+      				 
+         wordList.add(selectedWord);
+         Collections.sort(wordList);	
+      //						System.out.println(wordList);test for this
+      //						System.out.print(setWordList(wordList));
+      				
+      				// set list as text for My Word List text file
+      				 
+         File file =new File(myWordList);
+         PrintWriter printWriter = null;
+         try {
+            printWriter = new PrintWriter(file);
+         } 
+         catch (FileNotFoundException e1) {
+         						// TODO Auto-generated catch block
+            e1.printStackTrace();
+         }
+         printWriter.println(setWordList(wordList));
+         printWriter.close();
+      };			
+   }
+				
+				/**open word list when button is clicked
+				
+				 */
+   public class setWordListListener implements ActionListener{	
+      public void actionPerformed(ActionEvent e){
+         WordWindow myList = new WordWindow();
+         myList.setVisible(true);
+      //						System.out.println(myList.getComponents());			
+      };
+   }
+				
+/**get definition of selected word when button is clicked
+
+ *
+ */
+   public class setDefinitionListener implements ActionListener{	
+      public void actionPerformed(ActionEvent e){
+      				
+         String wordDef = "";
+         File dictFile = new File("D:/Java things/eclipse things/Josephs Reader/parsedenwiktionary");
+         IWiktionaryEdition wkt = JWKTL.openEdition(dictFile);
+         IWiktionaryPage page = wkt.getPageForWord(selectedWord);
+         IWiktionaryEntry entry = page.getEntry(0);
+         IWiktionarySense sense = entry.getSense(1);
+         wordDef = (sense.getGloss().getPlainText());
+         wkt.close();
+      				 
+         Dictionary.setText(selectedWord + ": " +wordDef);
+      				
+      				 
+      };
+   }
+				
+	
+}
+		
+	
+	
+
